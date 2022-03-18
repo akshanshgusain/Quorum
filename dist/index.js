@@ -1,3 +1,3 @@
 console.log("Hello World");
 console.log("second");
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.tsx.map

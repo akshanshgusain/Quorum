@@ -6,12 +6,12 @@ import {buildSchema} from "type-graphql";
 import {HelloResolver} from "./resolvers/hello";
 import {PostResolver} from "./resolvers/post";
 import {UserResolver} from "./resolvers/user";
-// import 'reflect-metadata';
 import {createClient} from 'redis';
 import session from 'express-session';
 import connectRedis from 'connect-redis';
 import {__prod__} from "./constants";
 import {MyContext} from "./types";
+import cors from 'cors';
 
 const main = async () => {
     // MikroORM setup
@@ -21,20 +21,17 @@ const main = async () => {
     // Express App
     const app = express();
     app.set("trust proxy", true);
-    // app.set("Access-Control-Allow-Origin", "*");
-    // app.set("Access-Control-Allow-Credentials", true);
 
     // Redis Client Setup
     const RedisStore = connectRedis(session);
-    //const redisURL = "redis://localhost:6379";
-    //{socket:{host:"127.0.0.1",port: 6379}}
-    //const redisClient = createClient({socket:{host:'localhost',port: 6379}});
     const redisClient = createClient();
     redisClient.on('error', (err) => console.log('Redis Client Error', err));
     await redisClient.connect();
-    // await redisClient.set('key', 'value');
-    // const value = await redisClient.get('key');
-    // console.log(value);
+
+    app.use(cors({
+        origin: 'http://localhost:3000',
+        credentials: true
+    }))
 
 
     app.use(session({
@@ -76,7 +73,10 @@ const main = async () => {
     await apolloServer.start();
     apolloServer.applyMiddleware({
         app,
-        cors: {origin: true, credentials: true, allowedHeaders: ['Content-Type', 'Authorization']}
+        cors: {origin: "https://studio.apollographql.com",
+            credentials: true,
+            allowedHeaders: ['Content-Type', 'Authorization']
+        }
     });
 
     console.log("asd");
